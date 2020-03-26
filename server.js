@@ -60,4 +60,40 @@ app
         });
       }
     });
+  })
+  // UPDATE
+  .put((req, res) => {
+    User.findByIdAndUpdate(
+      req.params.id,
+      {
+        name: req.body.newData.name,
+        email: req.body.newData.email,
+        password: req.body.newData.password
+      },
+      {
+        new: true
+      },
+      (err, data) => {
+        if (err) {
+          res.json({
+            success: false,
+            message: err
+          });
+        } else if (!data) {
+          res.json({
+            success: false,
+            message: "Not Found"
+          });
+        } else {
+          res.json({
+            success: true,
+            data: data
+          });
+        }
+      }
+    );
+  })
+  // DELETE
+  .delete((req, res) => {
+    // User.findByIdAndDelete()
   });
