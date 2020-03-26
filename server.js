@@ -18,99 +18,53 @@ app.listen(port, () => {
   console.log(`server is listening on port:${port}`);
 });
 
+function sendResponse(response, error, data) {
+  if (error) {
+    response.json({
+      success: false,
+      message: error
+    });
+  } else if (!data) {
+    response.json({
+      success: false,
+      message: "Not Found"
+    });
+  } else {
+    response.json({
+      success: true,
+      data: data
+    });
+  }
+}
+
 // CREATE
-app.post("/users", (req, res) => {
-  User.create(
-    {
-      name: req.body.newData.name,
-      email: req.body.newData.email,
-      password: req.body.newData.password
-    },
-    (err, data) => {
-      if (err) {
-        res.json({ success: false, message: err });
-      } else if (!data) {
-        res.json({ success: false, message: "Not Found" });
-      } else {
-        res.json({ success: true, data: data });
-      }
-    }
-  );
+app.post("/users", (request, response) => {
+  User.create({ ...request.body.newData }, (error, data) => {
+    sendResponse(response, error, data);
+  });
 });
 
 app
   .route("/users/:id")
-  // READ
-  .get((req, res) => {
-    User.findById(req.params.id, (err, data) => {
-      if (err) {
-        res.json({
-          success: false,
-          message: err
-        });
-      } else if (!data) {
-        res.json({
-          success: false,
-          message: "Not Found"
-        });
-      } else {
-        res.json({
-          success: true,
-          data: data
-        });
-      }
+  .get((request, response) => {
+    User.findById(request.params.id, (error, data) => {
+      sendResponse(response, error, data);
     });
   })
   // UPDATE
-  .put((req, res) => {
+  .put((request, response) => {
     User.findByIdAndUpdate(
-      req.params.id,
-      {
-        name: req.body.newData.name,
-        email: req.body.newData.email,
-        password: req.body.newData.password
-      },
-      {
-        new: true
-      },
-      (err, data) => {
-        if (err) {
-          res.json({
-            success: false,
-            message: err
-          });
-        } else if (!data) {
-          res.json({
-            success: false,
-            message: "Not Found"
-          });
-        } else {
-          res.json({
-            success: true,
-            data: data
-          });
-        }
+      request.params.id,
+      { ...request.body.newData },
+      { new: true },
+      (error, data) => {
+        sendResponse(response, error, data);
       }
     );
   })
   // DELETE
-  .delete((req, res) => {
-    User.findByIdAndDelete(req.params.id, (err, data) => {
-      if (err) {
-        res.json({
-          success: false,
-          message: err
-        });
-      } else if (!data) {
-        res.json({
-          success: false,
-          message: "Not Found"
-        });
-      } else {
-        res.json({
-          success: true,
-          data: data
-        });
-      }
+  .delete((request, response) => {
+    User.findByIdAndDelete(request.params.id, (error, data) => {
+      sendResponse(response, error, data);
     });
   });
